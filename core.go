@@ -63,12 +63,13 @@ func (id ID) Value() (driver.Value, error) {
 	return int64(id), nil
 }
 
-func New(nodeId int64) ID {
+func NewNode(nodeId int64) (*Node, error) {
 	node, err := snowflake.NewNode(nodeId)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return ID(node.Generate())
+
+	return (*Node)(node), nil
 }
 
 func Parse(s string) (ID, error) {
@@ -77,4 +78,10 @@ func Parse(s string) (ID, error) {
 		return ID(0), err
 	}
 	return ID(id), nil
+}
+
+type Node snowflake.Node
+
+func (n *Node) Generate() ID {
+	return ID((*snowflake.Node)(n).Generate())
 }
