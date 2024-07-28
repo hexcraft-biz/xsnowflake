@@ -8,7 +8,7 @@ snowflakeEpoch := time.Parse(time.RFC3339, "2024-07-29T05:00:00Z")
 generator, err := xsnowflake.NewGenerator(snowflakeNodeId, snowflakeEpoch)
 ```
 
-1. Generator a new snowflake ID
+2. Generator a new snowflake ID
 ```go
 generator.Generator()
 ```
