@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 )
@@ -63,13 +64,10 @@ func (id ID) Value() (driver.Value, error) {
 	return int64(id), nil
 }
 
-func NewNode(nodeId int64) (*Node, error) {
-	node, err := snowflake.NewNode(nodeId)
-	if err != nil {
-		return nil, err
-	}
+type Node snowflake.Node
 
-	return (*Node)(node), nil
+func (n *Node) Generate() ID {
+	return ID((*snowflake.Node)(n).Generate())
 }
 
 func Parse(s string) (ID, error) {
@@ -80,8 +78,12 @@ func Parse(s string) (ID, error) {
 	return ID(id), nil
 }
 
-type Node snowflake.Node
+func NewGenerator(nodeId int64, t time.Time) (*Node, error) {
+	node, err := snowflake.NewNode(nodeId)
+	if err != nil {
+		return nil, err
+	}
 
-func (n *Node) Generate() ID {
-	return ID((*snowflake.Node)(n).Generate())
+	snowflake.Epoch = t.UnixMilli()
+	return (*Node)(node), nil
 }
