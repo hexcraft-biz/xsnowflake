@@ -64,10 +64,20 @@ func (id ID) Value() (driver.Value, error) {
 	return int64(id), nil
 }
 
-type Node snowflake.Node
+type Generator snowflake.Node
 
-func (n *Node) Generate() ID {
+func (n *Generator) Generate() ID {
 	return ID((*snowflake.Node)(n).Generate())
+}
+
+func NewGenerator(nodeId int64, t time.Time) (*Generator, error) {
+	node, err := snowflake.NewNode(nodeId)
+	if err != nil {
+		return nil, err
+	}
+
+	snowflake.Epoch = t.UnixMilli()
+	return (*Generator)(node), nil
 }
 
 func Parse(s string) (ID, error) {
@@ -76,14 +86,4 @@ func Parse(s string) (ID, error) {
 		return ID(0), err
 	}
 	return ID(id), nil
-}
-
-func NewGenerator(nodeId int64, t time.Time) (*Node, error) {
-	node, err := snowflake.NewNode(nodeId)
-	if err != nil {
-		return nil, err
-	}
-
-	snowflake.Epoch = t.UnixMilli()
-	return (*Node)(node), nil
 }
